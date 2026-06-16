@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScopeLIVE — Redefinir Senha</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0A0A0A;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #111111;
+            border: 1px solid #2A2A2A;
+            border-top: 4px solid #39FF14;
+            padding: 40px;
+            width: 400px;
+            border-radius: 4px;
+        }
+        h1 { font-size: 28px; text-align: center; }
+        h1 span { color: #39FF14; }
+        p { color: #888; font-size: 13px; text-align: center; margin: 8px 0 24px; }
+        label { color: #888; font-size: 11px; font-weight: bold; display: block; margin-bottom: 5px; }
+        input {
+            width: 100%;
+            background: #1A1A1A;
+            border: 1px solid #39FF14;
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            border-radius: 2px;
+        }
+        button {
+            width: 100%;
+            background: #39FF14;
+            color: #0A0A0A;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        button:hover { background: #2AE010; }
+        .msg { text-align: center; margin-top: 16px; font-size: 14px; }
+        .msg.ok { color: #39FF14; }
+        .msg.erro { color: #FF4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SCOPE<span>LIVE</span></h1>
+        <p>Digite sua nova senha abaixo</p>
+
+        <label>NOVA SENHA</label>
+        <input type="password" id="senha" placeholder="Mínimo 6 caracteres"/>
+
+        <label>CONFIRMAR SENHA</label>
+        <input type="password" id="confirmar" placeholder="Repita a senha"/>
+
+        <button onclick="redefinir()">REDEFINIR SENHA</button>
+
+        <div class="msg" id="msg"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://xgmcvmpgvsaelblvincx.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbWN2bXBndnNhZWxibHZpbmN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExOTU0MDgsImV4cCI6MjA5Njc3MTQwOH0.sJaQX5Ii-wBzV8SPtoXvxP34BulCFFA2kGAIdsybG0E';
+
+        const { createClient } = supabase;
+        const client = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function redefinir() {
+            const senha = document.getElementById('senha').value;
+            const confirmar = document.getElementById('confirmar').value;
+            const msg = document.getElementById('msg');
+
+            if (senha.length < 6) {
+                msg.className = 'msg erro';
+                msg.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+                return;
+            }
+
+            if (senha !== confirmar) {
+                msg.className = 'msg erro';
+                msg.textContent = 'As senhas não coincidem.';
+                return;
+            }
+
+            const { error } = await client.auth.updateUser({ password: senha });
+
+            if (error) {
+                msg.className = 'msg erro';
+                msg.textContent = 'Erro: ' + error.message;
+            } else {
+                msg.className = 'msg ok';
+                msg.textContent = 'Senha redefinida com sucesso! Você já pode entrar no app.';
+            }
+        }
+    </script>
+</body>
+</html>
